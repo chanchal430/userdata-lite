@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import webApp from "@twa-dev/sdk";
+// import webApp from "@twa-dev/sdk";
 
 interface UserData {
   id: number;
@@ -16,10 +16,20 @@ export default function Home() {
   const [userData, setUserData] = useState<UserData | null>(null);
 
   useEffect(() => {
-    if (webApp.initDataUnsafe.user) {
-      setUserData(webApp.initDataUnsafe.user as UserData);
-    }
+    const loadTelegramSDK = async () => {
+      if (typeof window !== "undefined") {
+        const sdk = await import("@twa-dev/sdk");
+        const webApp = sdk.default;
+
+        if (webApp?.initDataUnsafe?.user) {
+          setUserData(webApp.initDataUnsafe.user as UserData);
+        }
+      }
+    };
+
+    loadTelegramSDK();
   }, []);
+
   return (
     <main className="p-4">
       {userData ? (
