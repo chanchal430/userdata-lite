@@ -6,16 +6,16 @@ const pool = new Pool({
 });
 
 export async function POST(req: NextRequest) {
-  console.log("⏳ API Called: /api/save-user");
+  console.log("✅ /api/save-user called");
+
+  const body = await req.json();
+  console.log("📦 Received:", body);
+
+  const { id, first_name, last_name, username, language_code, is_premium } =
+    body;
 
   try {
-    const body = await req.json();
-    console.log("📦 Request Body:", body);
-
-    const { id, first_name, last_name, username, language_code, is_premium } =
-      body;
-
-    const result = await pool.query(
+    await pool.query(
       `INSERT INTO telegram_user (id, first_name, last_name, username, language_code, is_premium)
        VALUES ($1, $2, $3, $4, $5, $6)
        ON CONFLICT (id) DO UPDATE SET 
@@ -27,13 +27,11 @@ export async function POST(req: NextRequest) {
       [id, first_name, last_name, username, language_code, is_premium]
     );
 
-    console.log("✅ DB Insert Success:", result.rowCount);
-
     return NextResponse.json({ status: "ok" });
-  } catch (error) {
-    console.error("❌ API Error:", error);
+  } catch (err) {
+    console.error("❌ DB error:", err);
     return NextResponse.json(
-      { status: "error", message: String(error) },
+      { status: "error", message: String(err) },
       { status: 500 }
     );
   }
