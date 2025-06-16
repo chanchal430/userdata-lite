@@ -55,7 +55,7 @@ export default function Home() {
             <h2 className="text-xl font-semibold mb-2">
               👋 Hi {userData.first_name}!
             </h2>
-            <p className="mb-2">We’ve saved your details. You are all set.</p>
+            <p className="mb-2">Welcome!</p>
 
             {/* <div className="text-sm text-gray-600 mt-4">
               <p>
