@@ -1,40 +1,38 @@
-//
-import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
+import { Pool } from "pg";
 
-// Setup Supabase client
-const supabase = createClient(
-  "https://ghrbkkfeadirapqedwtc.supabase.co",
-  process.env.SUPABASE_KEY! // Provided via Render environment
-);
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
 export async function POST(req: NextRequest) {
-  console.log("✅ /api/save-user called");
+  try {
+    console.log("✅ /api/save-user called");
 
-  const user = await req.json();
-  console.log("📦 Received:", user);
+    const body = await req.json();
+    console.log("📦 Received:", body);
 
-  const { id, first_name, last_name, username, language_code, is_premium } =
-    user;
+    const { id, first_name, last_name, username, language_code, is_premium } =
+      body;
 
-  const { data, error } = await supabase.from("telegram_user").upsert([
-    {
-      id,
-      first_name,
-      last_name,
-      username,
-      language_code,
-      is_premium,
-    },
-  ]);
+    await pool.query(
+      `INSERT INTO telegram_user (id, first_name, last_name, username, language_code, is_premium)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       ON CONFLICT (id) DO UPDATE SET 
+         first_name = EXCLUDED.first_name,
+         last_name = EXCLUDED.last_name,
+         username = EXCLUDED.username,
+         language_code = EXCLUDED.language_code,
+         is_premium = EXCLUDED.is_premium`,
+      [id, first_name, last_name, username, language_code, is_premium]
+    );
 
-  if (error) {
-    console.error("❌ Supabase error:", error);
+    return NextResponse.json({ status: "ok" });
+  } catch (error) {
+    console.error("❌ DB error:", error);
     return NextResponse.json(
-      { status: "error", message: error.message },
+      { status: "error", message: String(error) },
       { status: 500 }
     );
   }
-
-  return NextResponse.json({ status: "ok", data });
 }
