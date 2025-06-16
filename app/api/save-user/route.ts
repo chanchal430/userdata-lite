@@ -7,10 +7,10 @@ const pool = new Pool({
 
 export async function POST(req: NextRequest) {
   try {
-    console.log("✅ /api/save-user called");
+    console.log("/api/save-user called");
 
     const body = await req.json();
-    console.log("📦 Received:", body);
+    console.log("Received:", body);
 
     const { id, first_name, last_name, username, language_code, is_premium } =
       body;
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ status: "ok" });
   } catch (error) {
-    console.error("❌ DB error:", error);
+    console.error("DB error:", error);
     return NextResponse.json(
       { status: "error", message: String(error) },
       { status: 500 }

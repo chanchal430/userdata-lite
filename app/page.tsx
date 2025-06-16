@@ -32,14 +32,14 @@ export default function Home() {
           body: JSON.stringify(user),
         })
           .then((res) => {
-            console.log("✅ API Response Status:", res.status);
+            console.log("API Response Status:", res.status);
             return res.json();
           })
           .then((data) => {
-            console.log("📥 API Response Data:", data);
+            console.log("API Response Data:", data);
           })
           .catch((err) => {
-            console.error("❌ API Call Failed:", err);
+            console.error("API Call Failed:", err);
           });
       }
     };
@@ -56,20 +56,6 @@ export default function Home() {
               👋 Hi {userData.first_name}!
             </h2>
             <p className="mb-2">Welcome!</p>
-
-            {/* <div className="text-sm text-gray-600 mt-4">
-              <p>
-                <strong>Username:</strong> @{userData.username}
-              </p>
-              <p>
-                <strong>Language:</strong> {userData.language_code}
-              </p>
-              {userData.is_premium && (
-                <p className="text-green-600">
-                  🌟 You’re a Premium Telegram user
-                </p>
-              )}
-            </div> */}
           </div>
         </>
       ) : (
