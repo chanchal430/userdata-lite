@@ -57,7 +57,7 @@ export default function Home() {
             </h2>
             <p className="mb-2">We’ve saved your details. You are all set.</p>
 
-            <div className="text-sm text-gray-600 mt-4">
+            {/* <div className="text-sm text-gray-600 mt-4">
               <p>
                 <strong>Username:</strong> @{userData.username}
               </p>
@@ -69,7 +69,7 @@ export default function Home() {
                   🌟 You’re a Premium Telegram user
                 </p>
               )}
-            </div>
+            </div> */}
           </div>
         </>
       ) : (
