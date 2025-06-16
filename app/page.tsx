@@ -19,8 +19,20 @@ export default function Home() {
       const sdk = await import("@twa-dev/sdk");
       const webApp = sdk.default;
 
-      if (webApp?.initDataUnsafe?.user) {
-        setUserData(webApp.initDataUnsafe.user as UserData);
+      const user = webApp?.initDataUnsafe?.user;
+      if (user) {
+        setUserData(user as UserData);
+
+        // Send user data to backend
+        try {
+          await fetch("/api/save-user", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(user),
+          });
+        } catch (error) {
+          console.error("Failed to send user data", error);
+        }
       }
     };
 
