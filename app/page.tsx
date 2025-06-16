@@ -24,15 +24,23 @@ export default function Home() {
         setUserData(user as UserData);
 
         // Send user data to backend
-        try {
-          await fetch("/api/save-user", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(user),
+        await fetch("/api/save-user", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(user),
+        })
+          .then((res) => {
+            console.log("✅ API Response Status:", res.status);
+            return res.json();
+          })
+          .then((data) => {
+            console.log("📥 API Response Data:", data);
+          })
+          .catch((err) => {
+            console.error("❌ API Call Failed:", err);
           });
-        } catch (error) {
-          console.error("Failed to send user data", error);
-        }
       }
     };
 

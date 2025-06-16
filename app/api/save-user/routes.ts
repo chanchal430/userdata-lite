@@ -1,19 +1,22 @@
-// app/api/save-user/route.ts (App Router)
 import { NextRequest, NextResponse } from "next/server";
 import { Pool } from "pg";
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL, // put in .env.local
+  connectionString: process.env.DATABASE_URL,
 });
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const { id, first_name, last_name, username, language_code, is_premium } =
-    body;
+  console.log("⏳ API Called: /api/save-user");
 
   try {
-    await pool.query(
-      `INSERT INTO telegram_users (id, first_name, last_name, username, language_code, is_premium)
+    const body = await req.json();
+    console.log("📦 Request Body:", body);
+
+    const { id, first_name, last_name, username, language_code, is_premium } =
+      body;
+
+    const result = await pool.query(
+      `INSERT INTO telegram_user (id, first_name, last_name, username, language_code, is_premium)
        VALUES ($1, $2, $3, $4, $5, $6)
        ON CONFLICT (id) DO UPDATE SET 
          first_name = EXCLUDED.first_name,
@@ -24,9 +27,14 @@ export async function POST(req: NextRequest) {
       [id, first_name, last_name, username, language_code, is_premium]
     );
 
+    console.log("✅ DB Insert Success:", result.rowCount);
+
     return NextResponse.json({ status: "ok" });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ status: "error", message: error });
+    console.error("❌ API Error:", error);
+    return NextResponse.json(
+      { status: "error", message: String(error) },
+      { status: 500 }
+    );
   }
 }
