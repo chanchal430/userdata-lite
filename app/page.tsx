@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 interface UserData {
   id: number;
@@ -19,9 +20,32 @@ export default function Home() {
       const sdk = await import("@twa-dev/sdk");
       const webApp = sdk.default;
 
+      webApp.ready(); // notify telegram mini app is ready
+      webApp.expand(); // Expand to full height;
+
+      // set telegram theme colors
+      document.body.style.backgroundColor =
+        webApp.themeParams.bg_color || "#ffffff";
+
+      // Detect dark mode
+      if (webApp.colorScheme === "dark") {
+        document.body.classList.add("dark");
+      }
+
       const user = webApp?.initDataUnsafe?.user;
       if (user) {
         setUserData(user as UserData);
+
+        webApp.MainButton.setText("Get Started");
+        webApp.MainButton.show();
+
+        webApp.MainButton.onClick(() => {
+          webApp.HapticFeedback.notificationOccurred("success");
+
+          alert("Congrat! you clciked the main button");
+
+          webApp.MainButton.hide(); // Optional: hide after click
+        });
 
         // Send user data to backend
         await fetch("/api/save-user", {
@@ -55,6 +79,11 @@ export default function Home() {
             <h2 className="text-xl font-semibold mb-2">
               👋 Hi {userData.first_name}!
             </h2>
+            <Image
+              src={`https://t.me/i/userpic/320/${userData.username}.jpg`}
+              alt="Profile"
+              className="w-20 h-20 rounded-full mb-4 border"
+            />
             <p className="mb-2">Welcome!</p>
           </div>
         </>
