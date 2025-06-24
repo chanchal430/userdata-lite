@@ -14,6 +14,7 @@ interface UserData {
 
 export default function Home() {
   const [userData, setUserData] = useState<UserData | null>(null);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const loadTelegramSDK = async () => {
@@ -36,15 +37,24 @@ export default function Home() {
       if (user) {
         setUserData(user as UserData);
 
+        if (user.id) {
+          fetch(`/api/user-photo?id=${user.id}`)
+            .then((res) => res.json())
+            .then((data) => {
+              if (data.url) setPhotoUrl(data.url);
+            })
+            .catch((err) => console.error("Photo fetch error:", err));
+        }
+
         webApp.MainButton.setText("Get Started");
         webApp.MainButton.show();
 
         webApp.MainButton.onClick(() => {
           webApp.HapticFeedback.notificationOccurred("success");
 
-          alert("Congrat! you clciked the main button");
+          alert("Congrats! you clciked the main button");
 
-          webApp.MainButton.hide(); // Optional: hide after click
+          // webApp.MainButton.hide(); // Optional: hide after click
         });
 
         // Send user data to backend
@@ -74,19 +84,28 @@ export default function Home() {
   return (
     <main className="p-4">
       {userData ? (
-        <>
-          <div className="bg-white rounded-xl p-4 shadow text-gray-800">
-            <h2 className="text-xl font-semibold mb-2">
-              👋 Hi {userData.first_name}!
-            </h2>
+        <div className="bg-white rounded-xl p-4 shadow text-gray-800">
+          <h2 className="text-xl font-semibold mb-2">
+            👋 Hi {userData.first_name}!
+          </h2>
+
+          {photoUrl ? (
             <Image
-              src={`https://t.me/i/userpic/320/${userData.username}.jpg`}
+              src={photoUrl}
               alt="Profile"
+              width={80}
+              height={80}
               className="w-20 h-20 rounded-full mb-4 border"
             />
-            <p className="mb-2">Welcome!</p>
-          </div>
-        </>
+          ) : (
+            <div className="w-20 h-20 rounded-full mb-4 border bg-gray-200 flex items-center justify-center text-gray-500 text-sm">
+              No Photo
+            </div>
+          )}
+
+          <p className="mb-2">Welcome!</p>
+          <p className="text-sm text-gray-500">@{userData.username}</p>
+        </div>
       ) : (
         <div>Loading...</div>
       )}
